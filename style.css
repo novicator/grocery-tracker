@@ -1,0 +1,122 @@
+:root {
+  --bg: #0f172a;
+  --panel: #1e293b;
+  --panel-hover: #273449;
+  --text: #f1f5f9;
+  --muted: #94a3b8;
+  --have: #22c55e;
+  --miss: #ef4444;
+  --border: #334155;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: contain;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+header {
+  padding: 20px 20px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+header h1 {
+  margin: 0 0 4px;
+  font-size: 1.5rem;
+  letter-spacing: 0.02em;
+}
+
+.summary {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+main {
+  flex: 1;
+  padding: 12px 16px 20px;
+}
+
+#list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 14px;
+  margin-bottom: 8px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s ease, transform 0.08s ease;
+}
+
+.item:active { transform: scale(0.98); }
+.item:hover { background: var(--panel-hover); }
+
+.dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--miss);
+  flex-shrink: 0;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.item.have .dot {
+  background: var(--have);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+}
+
+.name {
+  font-size: 1.05rem;
+  text-transform: capitalize;
+  flex: 1;
+}
+
+.item.have .name { color: var(--text); }
+.item:not(.have) .name { color: var(--muted); }
+
+footer {
+  padding: 12px 16px calc(16px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}
+
+#resetBtn {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+#resetBtn:active { background: var(--panel); }
