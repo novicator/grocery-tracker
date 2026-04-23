@@ -1,6 +1,6 @@
 const GROCERIES = [
   "water", "oats", "strawberries", "blueberries", "almond butter",
-  "chia seeds", "milk", "eggs", "spinach", "avocado", "ginger",
+  "chia seeds", "milk", "eggs", "spinach", "pickles", "avocado", "ginger",
   "almonds", "chicken", "steak", "salmon", "rice", "sweet potato",
   "broccoli", "ghee", "salt", "honey", "pepper", "lemon pepper", "thyme"
 ];
