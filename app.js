@@ -83,10 +83,40 @@ function toggle(idx, el) {
   updateSummary();
 }
 
+function flashInput(message) {
+  addInput.classList.remove("error");
+  void addInput.offsetWidth;
+  addInput.classList.add("error");
+  if (message) {
+    const original = addInput.placeholder;
+    addInput.placeholder = message;
+    setTimeout(() => { addInput.placeholder = original; }, 1500);
+  }
+}
+
+function flashItem(name) {
+  const idx = items.findIndex(i => i.name === name);
+  if (idx < 0) return;
+  const li = listEl.children[idx];
+  if (!li) return;
+  li.scrollIntoView({ behavior: "smooth", block: "center" });
+  li.classList.remove("flash");
+  void li.offsetWidth;
+  li.classList.add("flash");
+}
+
 function addItem(rawName) {
   const name = rawName.trim().toLowerCase();
-  if (!name) return;
-  if (items.some(i => i.name === name)) return;
+  if (!name) {
+    flashInput("Type an item first");
+    addInput.focus();
+    return;
+  }
+  if (items.some(i => i.name === name)) {
+    flashInput(`"${name}" already in list`);
+    flashItem(name);
+    return;
+  }
   items.push({ name, have: false });
   saveItems();
   render();

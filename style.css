@@ -70,6 +70,28 @@ header h1 {
 #addInput:focus { border-color: var(--muted); }
 #addInput::placeholder { color: var(--muted); }
 
+#addInput.error {
+  animation: shake 0.35s ease;
+  border-color: var(--miss);
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+
+.item.flash {
+  animation: flash 0.9s ease;
+}
+
+@keyframes flash {
+  0%, 100% { background: var(--panel); }
+  30% { background: rgba(239, 68, 68, 0.25); }
+}
+
 #addForm button {
   width: 44px;
   background: var(--panel);
