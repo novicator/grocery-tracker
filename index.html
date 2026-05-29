@@ -15,17 +15,20 @@
 </head>
 <body>
   <header>
-    <h1>Groceries</h1>
+    <div id="tabs">
+      <button class="tab" type="button" data-tab="groceries">Groceries</button>
+      <button class="tab" type="button" data-tab="hygiene">Hygiene</button>
+    </div>
     <div class="summary">
       <span id="haveCount">0</span> have &middot;
       <span id="missCount">0</span> missing
     </div>
-    <form id="addForm" autocomplete="off">
-      <input id="addInput" type="text" placeholder="Add an item…" maxlength="40"
+    <div id="addRow">
+      <input id="addInput" type="text" placeholder="Type new item…" maxlength="40"
              autocapitalize="none" autocorrect="off" spellcheck="false"
              enterkeyhint="done" />
-      <button type="submit" aria-label="Add">＋</button>
-    </form>
+      <button id="addBtn" type="button">Add</button>
+    </div>
   </header>
   <main>
     <ul id="list"></ul>

@@ -45,12 +45,38 @@ header h1 {
   letter-spacing: 0.02em;
 }
 
+#tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.tab {
+  flex: 1;
+  padding: 10px;
+  background: var(--panel);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tab.active {
+  background: var(--panel-hover);
+  color: var(--text);
+  border-color: var(--muted);
+}
+
+.tab:active { opacity: 0.85; }
+
 .summary {
   font-size: 0.85rem;
   color: var(--muted);
 }
 
-#addForm {
+#addRow {
   display: flex;
   gap: 8px;
   margin-top: 12px;
@@ -58,30 +84,33 @@ header h1 {
 
 #addInput {
   flex: 1;
-  padding: 10px 12px;
+  padding: 12px 14px;
   background: var(--panel);
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: 10px;
   font-size: 1rem;
   outline: none;
+  min-width: 0;
 }
 
 #addInput:focus { border-color: var(--muted); }
 #addInput::placeholder { color: var(--muted); }
 
-#addInput.error {
-  animation: shake 0.35s ease;
-  border-color: var(--miss);
+#addBtn {
+  padding: 0 18px;
+  background: var(--have);
+  color: #0f172a;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 44px;
+  flex-shrink: 0;
 }
 
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-6px); }
-  40% { transform: translateX(6px); }
-  60% { transform: translateX(-4px); }
-  80% { transform: translateX(4px); }
-}
+#addBtn:active { opacity: 0.85; }
 
 .item.flash {
   animation: flash 0.9s ease;
@@ -89,21 +118,8 @@ header h1 {
 
 @keyframes flash {
   0%, 100% { background: var(--panel); }
-  30% { background: rgba(239, 68, 68, 0.25); }
+  30% { background: rgba(34, 197, 94, 0.25); }
 }
-
-#addForm button {
-  width: 44px;
-  background: var(--panel);
-  color: var(--text);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  font-size: 1.25rem;
-  line-height: 1;
-  cursor: pointer;
-}
-
-#addForm button:active { background: var(--panel-hover); }
 
 main {
   flex: 1;

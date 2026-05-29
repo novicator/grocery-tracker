@@ -5,48 +5,91 @@ const SEED_GROCERIES = [
   "broccoli", "ghee", "salt", "honey", "pepper", "lemon pepper", "thyme"
 ];
 
-const STORAGE_KEY = "grocery-tracker-items-v1";
-const LEGACY_KEY = "grocery-tracker-state-v1";
+const TAB_CONFIG = {
+  groceries: { key: "grocery-tracker-items-v1", legacy: "grocery-tracker-state-v1", seed: SEED_GROCERIES },
+  hygiene:   { key: "hygiene-tracker-items-v1", legacy: null, seed: [] }
+};
 
-function loadItems() {
+const TAB_KEY = "grocery-tracker-active-tab";
+const MIGRATIONS_KEY = "grocery-tracker-migrations";
+
+const MIGRATIONS = {
+  "2026-04-23-add-bananas-apples": () => {
+    for (const name of ["bananas", "apples"]) {
+      if (!lists.groceries.some(i => i.name === name)) lists.groceries.push({ name, have: false });
+    }
+  }
+};
+
+function loadList(tab) {
+  const cfg = TAB_CONFIG[tab];
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(cfg.key);
     if (raw) {
       const parsed = JSON.parse(raw);
       if (Array.isArray(parsed)) return parsed.filter(i => i && typeof i.name === "string");
     }
-    const legacyRaw = localStorage.getItem(LEGACY_KEY);
-    if (legacyRaw) {
-      const legacy = JSON.parse(legacyRaw);
-      return SEED_GROCERIES.map(name => ({ name, have: Boolean(legacy[name]) }));
+    if (cfg.legacy) {
+      const legacyRaw = localStorage.getItem(cfg.legacy);
+      if (legacyRaw) {
+        const legacy = JSON.parse(legacyRaw);
+        return cfg.seed.map(name => ({ name, have: Boolean(legacy[name]) }));
+      }
     }
   } catch {}
-  return SEED_GROCERIES.map(name => ({ name, have: false }));
+  return cfg.seed.map(name => ({ name, have: false }));
 }
 
-function saveItems() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+function saveList(tab) {
+  localStorage.setItem(TAB_CONFIG[tab].key, JSON.stringify(lists[tab]));
 }
 
-let items = loadItems();
+function runMigrations() {
+  let applied = [];
+  try { applied = JSON.parse(localStorage.getItem(MIGRATIONS_KEY) || "[]"); } catch {}
+  let changed = false;
+  for (const [id, fn] of Object.entries(MIGRATIONS)) {
+    if (!applied.includes(id)) {
+      try { fn(); applied.push(id); changed = true; } catch (e) { console.error("migration failed", id, e); }
+    }
+  }
+  if (changed) {
+    localStorage.setItem(MIGRATIONS_KEY, JSON.stringify(applied));
+    saveList("groceries");
+  }
+}
+
+let lists = {
+  groceries: loadList("groceries"),
+  hygiene: loadList("hygiene")
+};
+runMigrations();
+
+let currentTab = TAB_CONFIG[localStorage.getItem(TAB_KEY)] ? localStorage.getItem(TAB_KEY) : "groceries";
 
 const listEl = document.getElementById("list");
 const haveCountEl = document.getElementById("haveCount");
 const missCountEl = document.getElementById("missCount");
 const resetBtn = document.getElementById("resetBtn");
-const addForm = document.getElementById("addForm");
 const addInput = document.getElementById("addInput");
+const addBtn = document.getElementById("addBtn");
+const tabBtns = Array.from(document.querySelectorAll(".tab"));
+
+function items() { return lists[currentTab]; }
+function save() { saveList(currentTab); }
 
 function updateSummary() {
-  const have = items.reduce((n, i) => n + (i.have ? 1 : 0), 0);
+  const list = items();
+  const have = list.reduce((n, i) => n + (i.have ? 1 : 0), 0);
   haveCountEl.textContent = have;
-  missCountEl.textContent = items.length - have;
+  missCountEl.textContent = list.length - have;
 }
 
 function render() {
+  const list = items();
   listEl.innerHTML = "";
-  for (let idx = 0; idx < items.length; idx++) {
-    const item = items[idx];
+  for (let idx = 0; idx < list.length; idx++) {
+    const item = list[idx];
     const li = document.createElement("li");
     li.className = "item" + (item.have ? " have" : "");
 
@@ -77,70 +120,74 @@ function render() {
 }
 
 function toggle(idx, el) {
-  items[idx].have = !items[idx].have;
-  el.classList.toggle("have", items[idx].have);
-  saveItems();
+  const list = items();
+  list[idx].have = !list[idx].have;
+  el.classList.toggle("have", list[idx].have);
+  save();
   updateSummary();
 }
 
-function flashInput(message) {
-  addInput.classList.remove("error");
-  void addInput.offsetWidth;
-  addInput.classList.add("error");
-  if (message) {
-    const original = addInput.placeholder;
-    addInput.placeholder = message;
-    setTimeout(() => { addInput.placeholder = original; }, 1500);
-  }
-}
-
-function flashItem(name) {
-  const idx = items.findIndex(i => i.name === name);
-  if (idx < 0) return;
-  const li = listEl.children[idx];
-  if (!li) return;
-  li.scrollIntoView({ behavior: "smooth", block: "center" });
-  li.classList.remove("flash");
-  void li.offsetWidth;
-  li.classList.add("flash");
-}
-
 function addItem(rawName) {
-  const name = rawName.trim().toLowerCase();
+  const list = items();
+  const name = (rawName || "").trim().toLowerCase();
   if (!name) {
-    flashInput("Type an item first");
     addInput.focus();
     return;
   }
-  if (items.some(i => i.name === name)) {
-    flashInput(`"${name}" already in list`);
-    flashItem(name);
+  const existing = list.findIndex(i => i.name === name);
+  if (existing >= 0) {
+    addInput.value = "";
+    const li = listEl.children[existing];
+    if (li) {
+      li.scrollIntoView({ behavior: "smooth", block: "center" });
+      li.classList.remove("flash");
+      void li.offsetWidth;
+      li.classList.add("flash");
+    }
     return;
   }
-  items.push({ name, have: false });
-  saveItems();
+  list.push({ name, have: false });
+  save();
   render();
+  addInput.value = "";
 }
 
 function removeItem(idx) {
-  items.splice(idx, 1);
-  saveItems();
+  items().splice(idx, 1);
+  save();
   render();
 }
 
-addForm.addEventListener("submit", (e) => {
-  e.preventDefault();
+function handleAdd() {
   addItem(addInput.value);
+}
+
+function switchTab(tab) {
+  if (!TAB_CONFIG[tab] || tab === currentTab) return;
+  currentTab = tab;
+  localStorage.setItem(TAB_KEY, tab);
+  for (const btn of tabBtns) btn.classList.toggle("active", btn.dataset.tab === tab);
   addInput.value = "";
-  addInput.blur();
+  render();
+}
+
+addBtn.addEventListener("click", handleAdd);
+addBtn.addEventListener("touchend", (e) => { e.preventDefault(); handleAdd(); });
+addInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") { e.preventDefault(); handleAdd(); }
 });
 
+for (const btn of tabBtns) {
+  btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+}
+
 resetBtn.addEventListener("click", () => {
-  for (const item of items) item.have = false;
-  saveItems();
+  for (const item of items()) item.have = false;
+  save();
   render();
 });
 
+for (const btn of tabBtns) btn.classList.toggle("active", btn.dataset.tab === currentTab);
 render();
 
 if ("serviceWorker" in navigator) {

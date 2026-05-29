@@ -1,4 +1,4 @@
-const CACHE = "grocery-tracker-v5";
+const CACHE = "grocery-tracker-v7";
 const ASSETS = [
   "./",
   "./index.html",
