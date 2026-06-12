@@ -6,6 +6,7 @@ const SEED_GROCERIES = [
 ];
 
 const TAB_CONFIG = {
+  list:      { key: "list-tracker-items-v1", legacy: null, seed: [] },
   groceries: { key: "grocery-tracker-items-v1", legacy: "grocery-tracker-state-v1", seed: SEED_GROCERIES },
   hygiene:   { key: "hygiene-tracker-items-v1", legacy: null, seed: [] }
 };
@@ -60,6 +61,7 @@ function runMigrations() {
 }
 
 let lists = {
+  list: loadList("list"),
   groceries: loadList("groceries"),
   hygiene: loadList("hygiene")
 };
