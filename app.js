@@ -102,6 +102,16 @@ function render() {
     name.className = "name";
     name.textContent = item.name;
 
+    const qty = document.createElement("button");
+    qty.type = "button";
+    qty.className = "qty";
+    qty.textContent = item.qty || 1;
+    qty.setAttribute("aria-label", `${item.name} quantity needed: ${item.qty || 1}`);
+    qty.addEventListener("click", (e) => {
+      e.stopPropagation();
+      cycleQty(idx, qty);
+    });
+
     const del = document.createElement("button");
     del.type = "button";
     del.className = "delete";
@@ -114,11 +124,21 @@ function render() {
 
     li.appendChild(dot);
     li.appendChild(name);
+    li.appendChild(qty);
     li.appendChild(del);
     li.addEventListener("click", () => toggle(idx, li));
     listEl.appendChild(li);
   }
   updateSummary();
+}
+
+function cycleQty(idx, el) {
+  const list = items();
+  const cur = list[idx].qty || 1;
+  const next = cur >= 3 ? 1 : cur + 1;
+  list[idx].qty = next;
+  el.textContent = next;
+  save();
 }
 
 function toggle(idx, el) {

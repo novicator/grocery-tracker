@@ -173,6 +173,25 @@ main {
 .item.have .name { color: var(--text); }
 .item:not(.have) .name { color: var(--muted); }
 
+.qty {
+  background: var(--panel-hover);
+  color: var(--text);
+  border: 1px solid var(--border);
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.qty:hover { border-color: var(--muted); }
+.qty:active { background: var(--border); }
+
 .delete {
   background: transparent;
   border: none;
